@@ -5,4 +5,5 @@
     "NFC.nfcEvent|block": "When RFID card is detected",
     "NFC.getUID|block": "RFID UID string",
     "NFC.detectedRFIDcard|block": "Detected RFID card?"
+    "NFC.cardInitialised|block": "RFID card initialised?"
 }

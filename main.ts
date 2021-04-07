@@ -109,7 +109,7 @@ namespace NFC {
         }
     }
 
-    export function CardInitialised(): boolean {
+    export function cardInitialised(): boolean {
         return init;
       }
 
