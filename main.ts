@@ -52,7 +52,7 @@ namespace NFC {
         serial.redirect(
             pinRX,
             pinTX,
-            BaudRate.BaudRate115200
+            BaudRate.BaudRate9600
         )
         init=true;
     }
@@ -69,7 +69,7 @@ namespace NFC {
         serial.redirect(
             myRxPin,
             myTxPin,
-            BaudRate.BaudRate115200
+            BaudRate.BaudRate9600
         )
         init=true;
     }
