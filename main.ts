@@ -109,6 +109,10 @@ namespace NFC {
         }
     }
 
+    export function CardInitialised(): boolean {
+        return init;
+      }
+    
     //% weight=70
     //% blockId="detectedRFIDcard" block="Detected RFID card?"
     export function detectedRFIDcard(): boolean {
