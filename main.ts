@@ -109,6 +109,8 @@ namespace NFC {
         }
     }
 
+     //% weight=70
+    //% blockId="cardInitialised" block="Initialised RFID reader?"
     export function cardInitialised(): boolean {
         return init;
       }
