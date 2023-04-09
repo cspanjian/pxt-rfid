@@ -17,6 +17,10 @@
         "_locales/en/NFC-strings.json"
     ],
     "public": true,
+    "targetVersions": {
+        "target": "5.0.12",
+        "targetId": "microbit"
+    },
     "supportedTargets": [
         "microbit"
     ],
