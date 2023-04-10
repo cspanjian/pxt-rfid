@@ -57,13 +57,13 @@ namespace NFC {
     }
 
     //% weight=90
-    //% blockId="nfcEvent" block="When RFID card is detected"
+    //% blockId="nfcEvent" block="When NFC card is detected"
     export function nfcEvent(tempAct: Action) {
         myNFCevent = tempAct;
     }
 
     //% weight=80
-    //% blockId="getUID" block="RFID UID string"
+    //% blockId="getUID" block="NFC UID string"
     export function getUID(): string {
         serial.setRxBufferSize(50)
         let uidBuffer: number[] = []
@@ -84,13 +84,13 @@ namespace NFC {
     }
 
      //% weight=70
-    //% blockId="cardInitialised" block="Initialised RFID module?"
+    //% blockId="cardInitialised" block="Initialised NFC module?"
     export function cardInitialised(): boolean {
         return init;
       }
 
     //% weight=70
-    //% blockId="detectedRFIDcard" block="Detected RFID card?"
+    //% blockId="detectedRFIDcard" block="Detected NFC card?"
     export function detectedRFIDcard(): boolean {
         serial.setRxBufferSize(50)
         serial.writeBuffer(cmdUID);
