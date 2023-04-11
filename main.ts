@@ -27,7 +27,7 @@ namespace NFC {
      * @param pinRX to pinRX ,eg: SerialPin.P14
     */
     //% weight=100
-    //% blockId="NFC_setSerial" block="set NFC TX to %pinTX | RX to %pinRX"
+    //% blockId="NFC_setSerial" block="initialize by setting NFC module TX to %pinTX | RX to %pinRX"
     export function NFC_setSerial(pinTX: SerialPin, pinRX: SerialPin): void {
         myRxPin=pinRX;
         myTxPin=pinTX;
