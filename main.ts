@@ -303,7 +303,18 @@ namespace NFC {
         dataArr[dataArrLen_1] = checkSum;
     }
 
-
+    /**
+     * 当我写了一个"当检测到NFC卡，读取UID，等待100ms，读取字符串"这个事件处理程序的时候，
+     * 看到的现象是："读取UID"结束后，又再次执行"当检测到NFC卡，读取UID"这个流程
+     * 后面的"读取字符串"始终没有执行到。原因是：下面的forever里面，尝试用"basic.pause(50);"来让出CPU，
+     * 但是，因为在"读取UID"里面，也有"basic.pause(50);"，所以执行"读取UID"的时候，这个forever已经让出了CPU，
+     * 所以导致后续的forever抢到了CPU，所以看到的现象就是：一直在执行"当检测到NFC卡，读取UID"，
+     * 后面的"读取字符串"一直没有被执行，因为"读取字符串"一直抢不到CPU
+     * 所以，我加了这个pauseDetect的标记位，保证每次新的"当检测到NFC卡"在上一次程序执行完毕后再开始
+     * 
+     * 这个"basic.forever"，应该是js里面模拟多线程的，程序里可以有多个"basic.forever"，
+     * 且多个"basic.forever"之间没有依赖关系，除非程序员自己用代码控制
+     */
     basic.forever(() => {
         if (init && (myNFCevent != null) && !pauseDetect) {
             if (detectedRFIDcard()) {
