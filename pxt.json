@@ -10,11 +10,7 @@
     "files": [
         "README.md",
         "main.ts",
-        "main.cpp",
-        "_locales/zh-tw/NFC-strings.json",
-        "_locales/es-ES/NFC-strings.json",
-        "_locales/pt-PT/NFC-strings.json",
-        "_locales/en/NFC-strings.json"
+        "main.cpp"
     ],
     "public": true,
     "targetVersions": {
