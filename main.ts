@@ -12,6 +12,7 @@ namespace NFC {
     let myRxPin=SerialPin.P14;
     let myTxPin=SerialPin.P13;
     let init=false;
+    let pauseDetect = false; //如果正在执行检测到NFC卡的程序，则设置为true，避免不停的进入检测到NFC卡的程序
     //反正一直要用读取UID的cmd的，这里直接生成好存下来。直接把校验和填入，省去计算的时间
     let cmdUID = pins.createBufferFromArray([0x01, 0x08, 0xA1, 0x20, 0x00, 0x01, 0x00, -138])
 
@@ -27,7 +28,7 @@ namespace NFC {
      * @param pinRX to pinRX ,eg: SerialPin.P14
     */
     //% weight=100
-    //% blockId="NFC_setSerial" block="initialize by setting NFC module TX to %pinTX | RX to %pinRX"
+    //% blockId="NFC_setSerial" block="初始化NFC模块，NFC模块的 TX 连接到 %pinTX | RX 连接到 %pinRX"
     export function NFC_setSerial(pinTX: SerialPin, pinRX: SerialPin): void {
         myRxPin=pinRX;
         myTxPin=pinTX;
@@ -40,13 +41,13 @@ namespace NFC {
     }
 
     //% weight=95
-    //% blockId="NFC_disconnect" block="NFC disconnect"
+    //% blockId="NFC_disconnect" block="断开NFC模块"
     export function NFC_disconnect(): void {
         init=false;
     }
 
     //% weight=94
-    //% blockId="NFC_reconnect" block="NFC reconnect"
+    //% blockId="NFC_reconnect" block="重新连接NFC模块"
     export function NFC_reconnect(): void {
         serial.redirect(
             myRxPin,
@@ -57,13 +58,13 @@ namespace NFC {
     }
 
     //% weight=90
-    //% blockId="nfcEvent" block="When NFC card is detected"
+    //% blockId="nfcEvent" block="当检测到NFC卡"
     export function nfcEvent(tempAct: Action) {
         myNFCevent = tempAct;
     }
 
     //% weight=80
-    //% blockId="getUID" block="NFC UID string"
+    //% blockId="getUID" block="NFC卡的UID字符串"
     export function getUID(): string {
         serial.setRxBufferSize(50)
         let uidBuffer: number[] = []
@@ -84,13 +85,13 @@ namespace NFC {
     }
 
      //% weight=70
-    //% blockId="cardInitialised" block="Initialised NFC module?"
+    //% blockId="cardInitialised" block="NFC模块已经初始化?"
     export function cardInitialised(): boolean {
         return init;
       }
 
     //% weight=70
-    //% blockId="detectedRFIDcard" block="Detected NFC card?"
+    //% blockId="detectedRFIDcard" block="检测到NFC卡?"
     export function detectedRFIDcard(): boolean {
         serial.setRxBufferSize(50)
         serial.writeBuffer(cmdUID);
@@ -105,13 +106,13 @@ namespace NFC {
 
     //% weight=70
     //% myText
-    //% blockId="writeStringToCard" block="write string %myText to card"
+    //% blockId="writeStringToCard" block="向NFC卡写入字符串 %myText"
     export function writeStringToCard(myText: string): boolean {
         return sendStringToCard(myText);
     }
 
     //% weight=70
-    //% blockId="readStringFromCard" block="read string from card"
+    //% blockId="readStringFromCard" block="从NFC卡读取字符串"
     export function readStringFromCard(): string {
         return getStringFromCard();
     }
@@ -304,9 +305,11 @@ namespace NFC {
 
 
     basic.forever(() => {
-        if (init && (myNFCevent != null)) {
+        if (init && (myNFCevent != null) && !pauseDetect) {
             if (detectedRFIDcard()) {
+                pauseDetect = true; //暂时关闭NFC卡检测，让myNFCevent()里面定义的所有代码执行完毕
                 myNFCevent();
+                pauseDetect = false;//myNFCevent()执行完毕，重新开始检测NFC卡
             }
             basic.pause(50);
         }
