@@ -6,7 +6,7 @@ This is the NFC blocks
 ## Author
 Liou Zheng-Ji\
 劉正吉\
-[my page, https://sites.google.com/jes.mlc.edu.tw/ljj/](https://sites.google.com/jes.mlc.edu.tw/ljj/)
+[my page, https://sites.google.com/jes.mlc.edu.tw/ljj/](https://sites.google.com/jes.mlc.edu.tw/ljj/) 正吉的这个做的很好，很有参考价值
 
 ## Description
 This extension is for DFRobot "NFC Module for Arduino". It has a UART interface that can be connected to micro:bit.\
