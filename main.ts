@@ -2,6 +2,9 @@
 /**
  * NFC reader and write
  * 这个目前只能读写M1 S50卡，NTAG 213能读到uid，但是不能读写数据
+ * 不要尝试写入中文，因为microbit不能正确把中文解码成字节数组
+ * 如果要写中文，需要自己查汉字和编码对照表，然后把编码写入
+ * microbit不帮你做汉字到编码的转换
  */
 //% weight=10 color=#1d8045 icon="\uf0e7" block="NFC"
 namespace NFC {
