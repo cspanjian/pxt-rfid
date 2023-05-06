@@ -120,6 +120,19 @@ namespace NFC {
         return getStringFromCard();
     }
 
+    //% weight=70
+    //% myByteArray
+    //% blockId="writeByteArrayToCard" block="向NFC卡写入字节数组 %myByteArray"
+    export function writeByteArrayToCard(myByteArray: number[]): boolean {
+        return sendByteArrayToCard(myByteArray);
+    }
+
+    //% weight=70
+    //% blockId="readByteArrayFromCard" block="从NFC卡读取字节数组"
+    export function readByteArrayFromCard(): number[] {
+        return getByteArrayFromCard();
+    }
+
     function getHexStr(myNum: number): string {
         let tempStr = "";
         if (myNum < 0x0A) {
@@ -172,27 +185,34 @@ namespace NFC {
      */
     function sendStringToCard(myText: string): boolean{
         let byteArr = Buffer.fromUTF8(myText);
+        return sendByteArrayToCard(byteArr.toArray(NumberFormat.UInt8LE));
+    }
+    /**
+     * 因为microbit无法处理中文字符串，所以这里增加一个直接写入byte数组的能力
+     * 这样可以直接写入中文的utf8编码结果（byte数组），读的时候，直接读取byte数组
+     */
+    function sendByteArrayToCard(byteArr: number[]): boolean {
         byteArr[byteArr.length] = 0x00;
         byteArr[byteArr.length] = 0x00;
         let byteArrLen = byteArr.length;
         let byteArrIndex = 0;
-        for(let blockIndex=0x04;blockIndex<0x0B;blockIndex++){
+        for (let blockIndex = 0x04; blockIndex < 0x0B; blockIndex++) {
             //跳过0x07，因为这个是密码块，不能存储用户数据
-            if (blockIndex==0x07){
+            if (blockIndex == 0x07) {
                 continue;
             }
-            let oneBlock: number[]=[]
-            let i=0;
-            for(;i<16;i++){
-                if (byteArrIndex >= byteArrLen){
+            let oneBlock: number[] = []
+            let i = 0;
+            for (; i < 16; i++) {
+                if (byteArrIndex >= byteArrLen) {
                     break; //数据已经写完了，必用再继续了
                 }
                 oneBlock[i] = byteArr[byteArrIndex++];
             }
-            if(!writeOneBlock(oneBlock,blockIndex)){
+            if (!writeOneBlock(oneBlock, blockIndex)) {
                 return false;
             }
-            if(i<16){
+            if (i < 16) {
                 break; //表示当前块没填满，不用再继续填充和写数据了
             }
         }
@@ -234,6 +254,18 @@ namespace NFC {
      * 把RFID卡里面的数据读出来，并转为字符串
      */
     function getStringFromCard():string{
+        let byteArr = getByteArrayFromCard();
+        
+        if(byteArr.length>0){
+            return Buffer.fromArray(byteArr).toString();
+        }
+
+        return "";
+    }
+    /**
+     * 把RFID卡里面的数据读出来，并存储为byte数组
+     */
+    function getByteArrayFromCard(): number[] {
         let byteArr: number[] = []
         for (let blockIndex = 0x04; blockIndex < 0x0B; blockIndex++) {
             //跳过0x07，因为这个是密码块，不能存储用户数据
@@ -242,20 +274,17 @@ namespace NFC {
             }
             let oneBlock = readOneBlock(blockIndex);
             let oneBlockLen = oneBlock.length;
-            if(oneBlockLen>0){
+            if (oneBlockLen > 0) {
                 let byteArrLen = byteArr.length;
-                for(let i=0;i<oneBlockLen;i++){
-                    byteArr[byteArrLen+i]=oneBlock[i];
+                for (let i = 0; i < oneBlockLen; i++) {
+                    byteArr[byteArrLen + i] = oneBlock[i];
                 }
-            }else{
+            } else {
                 break;
             }
         }
-        if(byteArr.length>0){
-            return Buffer.fromArray(byteArr).toString();
-        }
 
-        return "";
+        return byteArr;
     }
     /**
      * 从一个block中读出数据，如果返回值为空数组，则表示没读到，不需要继续读取了
