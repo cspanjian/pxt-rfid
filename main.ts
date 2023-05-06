@@ -110,8 +110,8 @@ namespace NFC {
     //% weight=70
     //% myText
     //% blockId="writeStringToCard" block="向NFC卡写入字符串 %myText"
-    export function writeStringToCard(myText: string): boolean {
-        return sendStringToCard(myText);
+    export function writeStringToCard(myText: string): void {
+        sendStringToCard(myText);
     }
 
     //% weight=70
@@ -123,8 +123,8 @@ namespace NFC {
     //% weight=70
     //% myByteArray
     //% blockId="writeByteArrayToCard" block="向NFC卡写入字节数组 %myByteArray"
-    export function writeByteArrayToCard(myByteArray: number[]): boolean {
-        return sendByteArrayToCard(myByteArray);
+    export function writeByteArrayToCard(myByteArray: number[]): void {
+        sendByteArrayToCard(myByteArray);
     }
 
     //% weight=70
