@@ -1,5 +1,5 @@
 {
-    "name": "NFC扩展模块",
+    "name": "NFC",
     "version": "0.0.2",
     "description": "這是專為micro:bit提供的NFC積木(This is the NFC blocks)",
     "license": "MIT",

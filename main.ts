@@ -66,7 +66,7 @@ namespace NFC {
         myNFCevent = tempAct;
     }
 
-    //% weight=80
+    //% weight=85
     //% blockId="getUID" block="NFC卡的UID字符串"
     export function getUID(): string {
         serial.setRxBufferSize(50)
@@ -87,13 +87,13 @@ namespace NFC {
         }
     }
 
-     //% weight=70
+     //% weight=80
     //% blockId="cardInitialised" block="NFC模块已经初始化?"
     export function cardInitialised(): boolean {
         return init;
       }
 
-    //% weight=70
+    //% weight=75
     //% blockId="detectedRFIDcard" block="检测到NFC卡?"
     export function detectedRFIDcard(): boolean {
         serial.setRxBufferSize(50)
@@ -114,20 +114,20 @@ namespace NFC {
         sendStringToCard(myText);
     }
 
-    //% weight=70
+    //% weight=65
     //% blockId="readStringFromCard" block="从NFC卡读取字符串"
     export function readStringFromCard(): string {
         return getStringFromCard();
     }
 
-    //% weight=70
+    //% weight=60
     //% myByteArray
     //% blockId="writeByteArrayToCard" block="向NFC卡写入字节数组 %myByteArray"
     export function writeByteArrayToCard(myByteArray: number[]): void {
-        sendByteArrayToCard(myByteArray);
+        sendBufferToCard(Buffer.fromArray(myByteArray));
     }
 
-    //% weight=70
+    //% weight=55
     //% blockId="readByteArrayFromCard" block="从NFC卡读取字节数组"
     export function readByteArrayFromCard(): number[] {
         return getByteArrayFromCard();
@@ -185,13 +185,13 @@ namespace NFC {
      */
     function sendStringToCard(myText: string): boolean{
         let byteArr = Buffer.fromUTF8(myText);
-        return sendByteArrayToCard(byteArr.toArray(NumberFormat.UInt8LE));
+        return sendBufferToCard(byteArr);
     }
     /**
      * 因为microbit无法处理中文字符串，所以这里增加一个直接写入byte数组的能力
      * 这样可以直接写入中文的utf8编码结果（byte数组），读的时候，直接读取byte数组
      */
-    function sendByteArrayToCard(byteArr: number[]): boolean {
+    function sendBufferToCard(byteArr: Buffer): boolean {
         byteArr[byteArr.length] = 0x00;
         byteArr[byteArr.length] = 0x00;
         let byteArrLen = byteArr.length;
