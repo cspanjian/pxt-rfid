@@ -191,34 +191,34 @@ namespace NFC {
      * 因为microbit无法处理中文字符串，所以这里增加一个直接写入byte数组的能力
      * 这样可以直接写入中文的utf8编码结果（byte数组），读的时候，直接读取byte数组
      */
-    function sendBufferToCard(byteArr: Buffer): boolean {
-        byteArr[byteArr.length] = 0x00;
-        byteArr[byteArr.length] = 0x00;
-        let byteArrLen = byteArr.length;
-        let byteArrIndex = 0;
-        for (let blockIndex = 0x04; blockIndex < 0x0B; blockIndex++) {
-            //跳过0x07，因为这个是密码块，不能存储用户数据
-            if (blockIndex == 0x07) {
-                continue;
-            }
-            let oneBlock: number[] = []
-            let i = 0;
-            for (; i < 16; i++) {
-                if (byteArrIndex >= byteArrLen) {
-                    break; //数据已经写完了，必用再继续了
-                }
+function sendBufferToCard(byteArr: Buffer): boolean {
+    byteArr[byteArr.length] = 0x00;
+    byteArr[byteArr.length] = 0x00;
+    let byteArrLen = byteArr.length;
+    let byteArrIndex = 0;
+    for (let blockIndex = 0x04; blockIndex < 0x0B; blockIndex++) {
+        //跳过0x07，因为这个是密码块，不能存储用户数据
+        if (blockIndex == 0x07) {
+            continue;
+        }
+        let oneBlock: number[] = []
+        for (let i = 0; i < 16; i++) {
+            if (byteArrIndex >= byteArrLen) {
+                oneBlock[i] = 0x00; //数据已经写完了，用0x00填充
+            }else{
                 oneBlock[i] = byteArr[byteArrIndex++];
             }
-            if (!writeOneBlock(oneBlock, blockIndex)) {
-                return false;
-            }
-            if (i < 16) {
-                break; //表示当前块没填满，不用再继续填充和写数据了
-            }
         }
-
-        return true;
+        if (!writeOneBlock(oneBlock, blockIndex)) {
+            return false;
+        }
+        if (byteArrIndex >= byteArrLen) {
+            break; //表示数据已经写完了，不用再继续填充和写数据了
+        }
     }
+
+    return true;
+}
     /**
      * myData是16个元素的数组，是要写入到一个block的数据
      */
