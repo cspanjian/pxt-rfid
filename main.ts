@@ -130,7 +130,7 @@ namespace NFC {
     //% myByteArray
     //% blockId="writeByteArrayToCard" block="向NFC卡写入字节数组 %myByteArray"
     export function writeByteArrayToCard(myByteArray: number[]): void {
-        sendBufferToCard(Buffer.fromArray(myByteArray));
+        sendBufferToCard(myByteArray);
     }
 
     //% weight=55
@@ -191,40 +191,40 @@ namespace NFC {
      */
     function sendStringToCard(myText: string): boolean{
         let byteArr = Buffer.fromUTF8(myText);
-        return sendBufferToCard(byteArr);
+        return sendBufferToCard(byteArr.toArray(NumberFormat.Int8LE));
     }
     /**
      * 因为microbit无法处理中文字符串，所以这里增加一个直接写入byte数组的能力
      * 这样可以直接写入中文的utf8编码结果（byte数组），读的时候，直接读取byte数组
      */
-function sendBufferToCard(byteArr: Buffer): boolean {
-    byteArr[byteArr.length] = 0x00;
-    byteArr[byteArr.length] = 0x00;
-    let byteArrLen = byteArr.length;
-    let byteArrIndex = 0;
-    for (let blockIndex = 0x04; blockIndex < 0x0B; blockIndex++) {
-        //跳过0x07，因为这个是密码块，不能存储用户数据
-        if (blockIndex == 0x07) {
-            continue;
-        }
-        let oneBlock: number[] = []
-        for (let i = 0; i < 16; i++) {
+    function sendBufferToCard(byteArr: number[]): boolean {
+        byteArr[byteArr.length] = 0x00;
+        byteArr[byteArr.length] = 0x00;
+        let byteArrLen = byteArr.length;
+        let byteArrIndex = 0;
+        for (let blockIndex = 0x04; blockIndex < 0x0B; blockIndex++) {
+            //跳过0x07，因为这个是密码块，不能存储用户数据
+            if (blockIndex == 0x07) {
+                continue;
+            }
+            let oneBlock: number[] = []
+            for (let i = 0; i < 16; i++) {
+                if (byteArrIndex >= byteArrLen) {
+                    break;
+                }else{
+                    oneBlock[i] = byteArr[byteArrIndex++];
+                }
+            }
+            if (!writeOneBlock(oneBlock, blockIndex)) {
+                return false;
+            }
             if (byteArrIndex >= byteArrLen) {
-                oneBlock[i] = 0x00; //数据已经写完了，用0x00填充
-            }else{
-                oneBlock[i] = byteArr[byteArrIndex++];
+                break; //表示数据已经写完了，不用再继续填充和写数据了
             }
         }
-        if (!writeOneBlock(oneBlock, blockIndex)) {
-            return false;
-        }
-        if (byteArrIndex >= byteArrLen) {
-            break; //表示数据已经写完了，不用再继续填充和写数据了
-        }
-    }
 
-    return true;
-}
+        return true;
+    }
     /**
      * myData是16个元素的数组，是要写入到一个block的数据
      */
@@ -238,6 +238,10 @@ function sendBufferToCard(byteArr: Buffer): boolean {
         myBuffer[4] = blockNum;
         myBuffer[5] = 0x01;
         //把要发的数据复制到myBuffer
+        //如果myData不足16，则用0x00填充
+        for(let i=myData.length;i<16;i++){
+            myData[i] = 0x00;
+        }
         for(let i=6;i<22;i++){
             myBuffer[i] = myData[i-6];
         }
