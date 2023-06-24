@@ -43,13 +43,13 @@ namespace NFC {
         init=true;
     }
 
-    //% weight=95
+    //% weight=20
     //% blockId="NFC_disconnect" block="断开NFC模块"
     export function NFC_disconnect(): void {
         init=false;
     }
 
-    //% weight=94
+    //% weight=10
     //% blockId="NFC_reconnect" block="重新连接NFC模块"
     export function NFC_reconnect(): void {
         serial.redirect(
@@ -118,6 +118,12 @@ namespace NFC {
     //% blockId="readStringFromCard" block="从NFC卡读取字符串"
     export function readStringFromCard(): string {
         return getStringFromCard();
+    }
+
+    //% weight=50
+    //% blockId="readHexDataFromCard" block="从NFC卡读取16进制数据"
+    export function readHexDataFromCard(): string {
+        return getHexDataFromCard();
     }
 
     //% weight=60
@@ -262,6 +268,20 @@ function sendBufferToCard(byteArr: Buffer): boolean {
 
         return "";
     }
+
+    /**
+     * 把RFID卡里面的数据读出来，并转为16进制数据
+     */
+    function getHexDataFromCard(): string {
+        let byteArr = getByteArrayFromCard();
+
+        if (byteArr.length > 0) {
+            return convertString(byteArr, byteArr.length);
+        }
+
+        return "";
+    }
+
     /**
      * 把RFID卡里面的数据读出来，并存储为byte数组
      */
@@ -311,7 +331,7 @@ function sendBufferToCard(byteArr: Buffer): boolean {
             receivedBuffer = serial.readBuffer(22);
             for(let i=0;i<16;i++){
                 //出现连续两个0x00，则表示已经到了结尾了
-                if (receivedBuffer[i+5] == 0x00 && receivedBuffer[i+6] == 0x00){
+                if (i<15 && receivedBuffer[i+5] == 0x00 && receivedBuffer[i+6] == 0x00){
                     break;
                 }
                 retData[i] = receivedBuffer[i + 5];
