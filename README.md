@@ -1,5 +1,7 @@
 # NFC
 
+panjian: 这个针对串口的NFC读卡器，我已经调试正确了
+
 這是專為micro:bit提供的NFC積木\
 This is the NFC blocks
 
